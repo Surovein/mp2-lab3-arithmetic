@@ -14,7 +14,7 @@ protected:
 	T* pMem;
 	int top_index;
 	int size;
-	Stack(sz)
+	Stack(int sz)
 	{
 		size = sz;
 		T* pMem = new T[size];
