@@ -245,6 +245,12 @@ public:
 					double tmp2 = stack.pop();
 					stack.push(tmp + tmp2);
 				}
+				if (postfix[i].stroka == "-")
+				{
+					double tmp = stack.pop();
+					double tmp2 = stack.pop();
+					stack.push(tmp2 - tmp);
+				}
 				if (postfix[i].stroka == "*")
 				{
 					double tmp = stack.pop();
