@@ -6,7 +6,6 @@
 #include"stack.h"
 using namespace std;
 
-
 enum LEXEM_TYPE {
 	OPERAND,
 	OPERATION,
@@ -17,24 +16,24 @@ enum LEXEM_TYPE {
 struct Lexema
 {
 	string stroka;
-	int index = -1;
+	//int index = -1;
 	LEXEM_TYPE typeLex;
+
 };
 class  TArithmeticExpression
 {
 	string infix;
-	string postfix;
+	//string postfix;
 	vector<Lexema> postfix;
-	vector<Lexema> lexems;;// str[0] == char сравнение строки с символом
+	vector<Lexema> lexems;
 	map<string, int> priority =
 	{
 		{ "+",1}, {"-", 1}, {"*",2}, {"/", 2},{"(", 0}
 	};
-	map<char, double> operands;// дл€ переменных// шаблон
+	map<char, double> operands =
+	{
 
-
-
-
+	};
 
 public:
 
@@ -43,88 +42,10 @@ public:
 		infix = stroka;
 	}
 
-	vector<Lexema> getLexems()	
+	vector<Lexema> getLexems()
 	{
 		return lexems;
 	}
-
-	//bool Parse()
-	//{// 1) поиск скобок, удаление их 2)  разбиение на подстроки, получение лексем 3) проверка
-	//	int last_index = sizeof(infix) - 1;
-	//	int open = 0;
-	//	int close = 0;
-	//	int count_delete = 0;
-	//	int pos = 0;
-	//	while (infix.find_first_of("()") != -1) 
-	//	{
-	//		Lexema tmp;
-	//		tmp.stroka = infix[infix.find_first_of("()")];
-	//		if (tmp.stroka == "(")
-	//		{
-	//			open++;
-	//		}
-	//		else
-	//		{
-	//			close++;
-	//		}
-	//		tmp.type = 5;
-	//		tmp.index = infix.find_first_of("()") + count_delete +1; //+1 дл€ того чтобы у 0 индекса индекс был не -1, те у всех операций будет+1 к индексу
-	//		lexems.push_back(tmp);
-	//		infix.erase(infix.find_first_of("()"), 1);
-	//		count_delete += 1;
-	//	}
-	//	if (open != close)
-	//	{
-	//		return false; // ошибка
-	//	}
-	//	while (infix.find_first_of("+*/-") != -1)// знак
-	//	{
-	//		int index = infix.find_first_of("+*/-");
-	//		Lexema tmp;
-	//		tmp.stroka = infix[infix.find_first_of("+*/-")];
-	//		auto it = type.find(tmp.stroka);
-	//		if (it != type.end())// объ€снение
-	//		{
-	//			tmp.type = it->second;;
-	//		}
-	//		tmp.index = index + count_delete +1;
-	//		string substr_left = infix.substr(0, index);// элемент слева от знака
-	//		Lexema tmp2;
-	//		tmp2.stroka = substr_left;
-	//		auto it = type.find(tmp2.stroka);
-	//		if (it != type.end())
-	//		{
-	//			tmp2.type = it->second; // если зайдет сюда, значит два знака подр€д => ошибка
-	//			return false;
-	//		}
-	//		else
-	//		{
-	//			tmp2.type = 0; // 0 - double
-	//		}
-	//		tmp2.index = tmp.index - 2;
-	//		lexems.push_back(tmp);
-	//		lexems.push_back(tmp2);
-	//		infix.erase(0,infix.find_first_of("+*/-")+1); // наверное так
-	//		count_delete += (infix.find_first_of("+*/-") + 1);
-	//	}
-	//	Lexema tmp;
-	//	tmp.stroka = infix;
-	//	auto it = type.find(tmp.stroka);
-	//	if (it != type.end())// объ€снение
-	//	{
-	//		tmp.type = it->second;// если зайдет сюда, значит два знака подр€д => ошибка
-	//		return false;
-	//	}
-	//	else
-	//	{
-	//		tmp.type = 0;
-	//	}
-	//	tmp.index = last_index;
-	//	lexems.push_back(tmp);  /// с помощью index сортирую получившийс€ вектор lexem и получаю правильный пор€док лексем
-	//	return true;
-	//}
-
-
 	void Parse2()
 	{
 		int open = 0;
@@ -133,7 +54,8 @@ public:
 
 
 		while (pos < infix.size()) {
-			string x = string(infix[pos], 1);
+			string x(1, infix[pos]);
+			//string x = string(infix[pos], 1);
 			if (x.find_first_of("()") != -1)
 			{
 				Lexema tmp;
@@ -172,16 +94,17 @@ public:
 				}
 				else if (isdigit(infix[pos])) {
 					pos++;
-					while (isdigit(infix[pos]) || (infix[pos] == '.'))
+					while (isdigit(infix[pos]) || (infix[pos] == ','))
 					{
-						x += string(infix[pos], 1);
+						string next_element(1, infix[pos]);
+						x += next_element;
 						pos++;
 					}
 					// x = "123.45"
 					Lexema tmp;
 					tmp.stroka = x;
 					tmp.typeLex = OPERAND;
-					lexems.push_back(tmp);// где то еще нужно перевести в double
+					lexems.push_back(tmp);
 				}
 			}
 		}
@@ -190,9 +113,9 @@ public:
 	{
 		int open = 0;
 		int close = 0;
-		for (int i = 0; i < sizeof(lexems) - 1; i++)
+		for (int i = 0; i < lexems.size() - 1; i++)
 		{
-			if (lexems[i].typeLex == lexems[i + 1].typeLex && lexems[i].typeLex != BRACKET && lexems[i+1].typeLex!= BRACKET)
+			if (lexems[i].typeLex == lexems[i + 1].typeLex && lexems[i].typeLex != BRACKET && lexems[i + 1].typeLex != BRACKET)
 			{
 				return false;
 			}
@@ -200,17 +123,17 @@ public:
 			{
 				open++;
 			}
-			else
+			else if (lexems[i].stroka == ")")
 			{
 				close++;
 			}
-			
+
 		}
-		if (lexems[sizeof(lexems) - 1].stroka == "(")
+		if (lexems[lexems.size() - 1].stroka == "(")
 		{
 			open++;
 		}
-		else
+		else if (lexems[lexems.size() - 1].stroka == ")")
 		{
 			close++;
 		}
@@ -220,15 +143,149 @@ public:
 		}
 		return true;
 	}
-	void ToPostfix(); // построение постфиксной записи
+	void ToPostfix(map<char, double>& values )//значение по умолчанию
+	{
+		int size = lexems.size(); // построение постфиксной записи
+		Stack<Lexema> stack(size);
+		for (int i = 0; i < size; i++)
+		{
+			if (lexems[i].typeLex == OPERAND || lexems[i].typeLex == VARIABLE)
+			{
+				postfix.push_back(lexems[i]);
+				if (lexems[i].typeLex == VARIABLE)
+				{
+					//cout << "33993939393" << endl;
+					map<char, double>::iterator pos = values.find(lexems[i].stroka[0]);
+					//cout << "12345" << endl;
+					double val;
+					if (pos == values.end())
+					{
+						cout << "¬ведите значение" << endl << lexems[i].stroka << "=" << endl;
+						cin >> val;
+					}
+					else
+					{
+						val = pos->second;
+					}
+					operands.insert({ lexems[i].stroka[0], val});
+				}
+			}
+			else
+			{
+					if(lexems[i].typeLex == BRACKET)
+					{
+						if (lexems[i].stroka == "(")
+						{
+							stack.push(lexems[i]);
+						}
+						else
+						{
+							while (stack.top().stroka != "(")
+							{
+								Lexema tmp = stack.pop();
+								postfix.push_back(tmp);
+							}
+							Lexema tmp = stack.pop();
+						}
+					}
+					//case(OPERATION):
+					else
+					{
+						int j = 0;
+						int size_stack = stack.stack_real_size();
+						int next_lexema_priority = 0;
+						int lexema_priority = 0;
+						auto it = priority.find(lexems[i].stroka);
+						if (it != priority.end())
+						{
+							lexema_priority = it->second;
+						}
+						if (stack.emptiness_сheck())
+						{
+							stack.push(lexems[i]);/// исключение доступа пам€ти
+						}
+						else
+						{
+							auto it2 = priority.find(stack.top().stroka);
+							if (it2 != priority.end())
+							{
+								next_lexema_priority = it2->second;
+							}
+							while (lexema_priority <= next_lexema_priority && size_stack != 0)
+							{
+								Lexema element = stack.pop();
+								postfix.push_back(element);
+								auto it2 = priority.find(stack.top().stroka);
+								next_lexema_priority = it2->second;//искл
+								size_stack = stack.stack_real_size();
+							}
+							stack.push(lexems[i]);
+						}
+					}
+
+				}
+		}
+		int stack_size_2 = stack.stack_real_size();
+		for (int i = 0; i < stack_size_2 ; i++)
+		{
+			Lexema tmp = stack.pop();
+			postfix.push_back(tmp);
+		}
+	}
+	double Calculate()//
+	{
+		Stack<double> stack(postfix.size());
+		for (int i = 0; i < postfix.size(); i++)
+		{
+			if (postfix[i].typeLex == OPERATION)
+			{
+				if (postfix[i].stroka == "+")
+				{
+					double tmp = stack.pop();
+					double tmp2 = stack.pop();
+					stack.push(tmp + tmp2);
+				}
+				if (postfix[i].stroka == "*")
+				{
+					double tmp = stack.pop();
+					double tmp2 = stack.pop();
+					stack.push(tmp * tmp2);
+				}
+				if (postfix[i].stroka == "/")
+				{
+					double tmp = stack.pop();
+					double tmp2 = stack.pop();
+					stack.push(tmp2/tmp);
+				}
+			}
+			else if(postfix[i].typeLex == OPERAND)
+			{
+				stack.push(stod(postfix[i].stroka));
+			}
+			else if (postfix[i].typeLex == VARIABLE)
+			{
+				double value;
+				auto it = operands.find(postfix[i].stroka[0]);
+				if (it != operands.end())
+				{
+					value = it->second;
+				}
+				stack.push(value);
+			}
+		}
+		return stack.top();
+	}
 	string GetInfix() const 
 	{
 		return infix;
 	}
-	string GetPostfix() const 
+	vector<Lexema> GetPostfix() const 
 	{
 		return postfix;
 	}
 	vector<char> GetOperands() const;
-	double Calculate(const map<char, double>& values);
+	~TArithmeticExpression()
+	{
+
+	}
 };

@@ -10,14 +10,14 @@
 template<typename T>
 class Stack
 {
-protected:
+public:
 	T* pMem;
 	int top_index;
 	int size;
 	Stack(int sz)
 	{
 		size = sz;
-		T* pMem = new T[size];
+		pMem = new T[size];
 		top_index = -1;
 	}
 public:
@@ -26,7 +26,7 @@ public:
 		if (top_index + 1 < size)
 		{
 			top_index += 1;
-			pMem[top_index] = value;
+			pMem[top_index] = value;// память не выделяется
 		}
 		else
 		{
@@ -54,7 +54,7 @@ public:
 	}
 	bool emptiness_сheck()
 	{
-		return (top_index == -1);
+		return (top_index == -1); //если пуст то 1
 	}
 	int stack_real_size()
 	{
@@ -64,7 +64,7 @@ public:
 	{
 		top_index = -1;
 	}
-	~stack()
+	~Stack()
 	{
 		delete[] pMem;
 	}
