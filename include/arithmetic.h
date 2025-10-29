@@ -16,24 +16,19 @@ enum LEXEM_TYPE {
 struct Lexema
 {
 	string stroka;
-	//int index = -1;
 	LEXEM_TYPE typeLex;
 
 };
 class  TArithmeticExpression
 {
 	string infix;
-	//string postfix;
 	vector<Lexema> postfix;
 	vector<Lexema> lexems;
 	map<string, int> priority =
 	{
 		{ "+",1}, {"-", 1}, {"*",2}, {"/", 2},{"(", 0}
 	};
-	map<char, double> operands =
-	{
-
-	};
+	map<char, double> operands;
 
 public:
 
@@ -55,7 +50,6 @@ public:
 
 		while (pos < infix.size()) {
 			string x(1, infix[pos]);
-			//string x = string(infix[pos], 1);
 			if (x.find_first_of("()") != -1)
 			{
 				Lexema tmp;
@@ -94,7 +88,7 @@ public:
 				}
 				else if (isdigit(infix[pos])) {
 					pos++;
-					while (isdigit(infix[pos]) || (infix[pos] == ','))
+					while (isdigit(infix[pos]) || (infix[pos] == ',') || (infix[pos] == '.'))
 					{
 						string next_element(1, infix[pos]);
 						x += next_element;
@@ -143,7 +137,7 @@ public:
 		}
 		return true;
 	}
-	void ToPostfix(map<char, double>& values )//значение по умолчанию
+	void ToPostfix( )//значение по умолчанию
 	{
 		int size = lexems.size(); // построение постфиксной записи
 		Stack<Lexema> stack(size);
@@ -152,23 +146,6 @@ public:
 			if (lexems[i].typeLex == OPERAND || lexems[i].typeLex == VARIABLE)
 			{
 				postfix.push_back(lexems[i]);
-				if (lexems[i].typeLex == VARIABLE)
-				{
-					//cout << "33993939393" << endl;
-					map<char, double>::iterator pos = values.find(lexems[i].stroka[0]);
-					//cout << "12345" << endl;
-					double val;
-					if (pos == values.end())
-					{
-						cout << "¬ведите значение" << endl << lexems[i].stroka << "=" << endl;
-						cin >> val;
-					}
-					else
-					{
-						val = pos->second;
-					}
-					operands.insert({ lexems[i].stroka[0], val});
-				}
 			}
 			else
 			{
@@ -214,7 +191,7 @@ public:
 							while (lexema_priority <= next_lexema_priority && size_stack != 0)
 							{
 								Lexema element = stack.pop();
-								postfix.push_back(element);
+								postfix.push_back(element);//искл
 								auto it2 = priority.find(stack.top().stroka);
 								next_lexema_priority = it2->second;//искл
 								size_stack = stack.stack_real_size();
@@ -231,6 +208,28 @@ public:
 			Lexema tmp = stack.pop();
 			postfix.push_back(tmp);
 		}
+	}
+	void Variable(map<char, double>& values)
+	{
+		for (int i = 0; i < lexems.size(); i++)
+		{
+			if (lexems[i].typeLex == VARIABLE)
+			{
+				map<char, double>::iterator pos = values.find(lexems[i].stroka[0]);
+				double val;
+				if (pos == values.end())
+				{
+					cout << "¬ведите значение" << endl << lexems[i].stroka << "=" << endl;
+					cin >> val;
+				}
+				else
+				{
+					val = pos->second;
+				}
+				operands.insert({ lexems[i].stroka[0], val });
+			}
+		}
+
 	}
 	double Calculate()//
 	{
@@ -288,6 +287,10 @@ public:
 	vector<Lexema> GetPostfix() const 
 	{
 		return postfix;
+	}
+	vector<Lexema> GetLexems() const
+	{
+		return lexems;
 	}
 	vector<char> GetOperands() const;
 	~TArithmeticExpression()

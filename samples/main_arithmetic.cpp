@@ -5,7 +5,6 @@
 int main()
 {
 	map<char, double> values;
-	std::setlocale(LC_NUMERIC, "C");
 	setlocale(LC_ALL, "rus");
 	string stroka;
 	cout << "Введите строку" << endl;
@@ -14,7 +13,8 @@ int main()
 	X.Parse2();
 	if (X.check())
 	{
-		X.ToPostfix(values);
+		X.ToPostfix();
+		X.Variable(values);
 		cout << "Результат" << endl;
 		cout << X.Calculate()<<endl;
 	}
