@@ -57,14 +57,39 @@ public:
 				if (tmp.stroka == "(")
 				{
 					open++;
+					if (pos + 1 < infix.size() && infix[pos + 1] == ('-'))
+					{
+						while (isdigit(infix[pos]) || (infix[pos] == ',') || (infix[pos] == '.') || infix[pos] == ')' || infix[pos] == '-')// унарный минус
+						{
+							string next_element(1, infix[pos]);
+							if (next_element != "(" || next_element != ")")
+							{
+								x += next_element;
+							}
+							pos++;
+						}
+						close++;
+						Lexema tmp;
+						tmp.stroka = x;
+						tmp.typeLex = OPERAND;
+						lexems.push_back(tmp);
+					}
+					else
+					{
+						tmp.typeLex = BRACKET;
+						lexems.push_back(tmp);
+						pos++;
+					}
+
 				}
 				else
 				{
 					close++;
+					tmp.typeLex = BRACKET;
+					lexems.push_back(tmp);
+					pos++;
 				}
-				tmp.typeLex = BRACKET;
-				lexems.push_back(tmp);
-				pos++;
+
 			}
 
 			else if (x.find_first_of("+*/-") != -1)// знак
@@ -192,7 +217,11 @@ public:
 							{
 								Lexema element = stack.pop();
 								postfix.push_back(element);//искл
-								auto it2 = priority.find(stack.top().stroka);
+								if (stack.emptiness_сheck())
+								{
+									break;
+								}
+								auto it2 = priority.find(stack.top().stroka); // index = -1
 								next_lexema_priority = it2->second;//искл
 								size_stack = stack.stack_real_size();
 							}

@@ -31,7 +31,7 @@ public:
 		else
 		{
 			T* tmp = new T[size*2];
-			for (int i = 0; i < top_index; i++)
+			for (int i = 0; i <= top_index; i++) // <=?
 			{
 				tmp[i] = pMem[i];
 			}
@@ -44,7 +44,10 @@ public:
 	}
 	T top()
 	{
-		return pMem[top_index];
+		if (top_index != -1)
+		{
+			return pMem[top_index];
+		}
 	}
 	T pop()
 	{

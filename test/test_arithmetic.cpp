@@ -177,10 +177,46 @@ TEST(CAN_CALCULATE, test16)
 	{
 		{'a',10},{'b',2}, {'c',3}
 	};
-	string stroka = "(1.0+2.0)*3.0+a+b";//искл
+	string stroka = "(1.0+2.0)*3.0+a+b+c*a";
 	TArithmeticExpression X(stroka);
 	X.Parse2();
 	X.ToPostfix();
 	X.Variable(values);
-	EXPECT_EQ(41, X.Calculate());
+	EXPECT_EQ(51, X.Calculate());
+}
+TEST(CAN_CALCULATE, test17)
+{
+	map<char, double> values;
+	string stroka = "10+(-1)";
+	TArithmeticExpression X(stroka);
+	X.Parse2();
+	X.ToPostfix();
+	X.Variable(values);
+	EXPECT_EQ(9, X.Calculate());
+}
+TEST(CAN_CALCULATE, test18)
+{
+	map<char, double> values;
+	string stroka = "10*(-1)";
+	TArithmeticExpression X(stroka);
+	X.Parse2();
+	X.ToPostfix();
+	X.Variable(values);
+	EXPECT_EQ(-10, X.Calculate());
+}
+TEST(arithm3, test19) {
+	map<char, double> values;
+	string stroka = "1,0+(-1,0)";
+	vector<Lexema> v = { {"1,0", OPERAND},  {"-1,0", OPERAND}, { "+", OPERATION } };
+	TArithmeticExpression X(stroka);
+	X.Parse2();
+	X.ToPostfix();
+	X.Variable(values);
+	vector<Lexema> res = X.GetPostfix();
+	EXPECT_EQ(v.size(), res.size());
+	for (int i = 0; i < v.size(); i++)
+	{
+		EXPECT_EQ(v[i].stroka, res[i].stroka);
+		EXPECT_EQ(v[i].typeLex, res[i].typeLex);
+	}
 }
