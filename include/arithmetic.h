@@ -46,10 +46,9 @@ public:
 		int open = 0;
 		int close = 0;
 		int pos = 0;
-
-
 		while (pos < infix.size()) {
 			string x(1, infix[pos]);
+			//if (x.find_first_of("()") != -1 && (pos + 1 < infix.size()) && (infix[pos + 1] != '-'))
 			if (x.find_first_of("()") != -1)
 			{
 				Lexema tmp;
@@ -57,49 +56,71 @@ public:
 				if (tmp.stroka == "(")
 				{
 					open++;
-					if (pos + 1 < infix.size() && infix[pos + 1] == ('-'))
-					{
-						while (isdigit(infix[pos]) || (infix[pos] == ',') || (infix[pos] == '.') || infix[pos] == ')' || infix[pos] == '-')// унарный минус
-						{
-							string next_element(1, infix[pos]);
-							if (next_element != "(" || next_element != ")")
-							{
-								x += next_element;
-							}
-							pos++;
-						}
-						close++;
-						Lexema tmp;
-						tmp.stroka = x;
-						tmp.typeLex = OPERAND;
-						lexems.push_back(tmp);
-					}
-					else
-					{
-						tmp.typeLex = BRACKET;
-						lexems.push_back(tmp);
-						pos++;
-					}
-
 				}
+				//	if (pos + 1 < infix.size() && infix[pos + 1] == ('-'))
+				//	{
+				//		pos++;
+				//		while (isdigit(infix[pos]) || (infix[pos] == ',') || (infix[pos] == '.') || infix[pos] == ')' || infix[pos] == '-')// унарный минус
+				//		{
+				//			string next_element(1, infix[pos]);
+				//			if (next_element != "(" || next_element != ")")
+				//			{
+				//				x += next_element;
+				//			}
+				//			pos++;
+				//		}
+				//		close++;
+				//		Lexema tmp;
+				//		tmp.stroka = x;
+				//		tmp.typeLex = OPERAND;
+				//		lexems.push_back(tmp);
+				//	}
+				//	else
+				//	{
+				//		tmp.typeLex = BRACKET;
+				//		lexems.push_back(tmp);
+				//		pos++;
+				//	}
+
+				//}
 				else
 				{
 					close++;
-					tmp.typeLex = BRACKET;
+				}
+				tmp.typeLex = BRACKET;
+				lexems.push_back(tmp);
+				pos++;
+			}
+
+			else if (x.find_first_of("+*/-") != -1)// знак
+			{
+				if (((pos - 1 < 0) && (infix[pos] == '-')) || ((pos - 1 >= 0) && infix[pos - 1] == ('(') && (infix[pos] == '-')))
+				{
+					x = "-"; pos++;
+					while (isdigit(infix[pos]) || (infix[pos] == ',') || (infix[pos] == '.'))// унарный минус
+					{
+						x += infix[pos];
+						pos++;
+					}
+					Lexema tmp;
+					tmp.stroka = x;
+					tmp.typeLex = OPERAND;
+					lexems.push_back(tmp);
+				}
+				else
+				{
+					Lexema tmp;
+					tmp.stroka = x;
+					tmp.typeLex = OPERATION;
 					lexems.push_back(tmp);
 					pos++;
 				}
 
 			}
-
-			else if (x.find_first_of("+*/-") != -1)// знак
-			{
-				Lexema tmp;
-				tmp.stroka = x;
-				tmp.typeLex = OPERATION;
-				lexems.push_back(tmp);
-				pos++;
-			}
+			//else if(x.find_first_of("(") != -1)
+			//{
+			//	pos++;
+			//}
 			else {
 
 				// aa + bb
@@ -162,7 +183,7 @@ public:
 		}
 		return true;
 	}
-	void ToPostfix( )//значение по умолчанию
+	void ToPostfix()//значение по умолчанию
 	{
 		int size = lexems.size(); // построение постфиксной записи
 		Stack<Lexema> stack(size);
@@ -174,65 +195,65 @@ public:
 			}
 			else
 			{
-					if(lexems[i].typeLex == BRACKET)
+				if (lexems[i].typeLex == BRACKET)
+				{
+					if (lexems[i].stroka == "(")
 					{
-						if (lexems[i].stroka == "(")
-						{
-							stack.push(lexems[i]);
-						}
-						else
-						{
-							while (stack.top().stroka != "(")
-							{
-								Lexema tmp = stack.pop();
-								postfix.push_back(tmp);
-							}
-							Lexema tmp = stack.pop();
-						}
+						stack.push(lexems[i]);
 					}
-					//case(OPERATION):
 					else
 					{
-						int j = 0;
-						int size_stack = stack.stack_real_size();
-						int next_lexema_priority = 0;
-						int lexema_priority = 0;
-						auto it = priority.find(lexems[i].stroka);
-						if (it != priority.end())
+						while (stack.top().stroka != "(")
 						{
-							lexema_priority = it->second;
+							Lexema tmp = stack.pop();
+							postfix.push_back(tmp);
 						}
-						if (stack.emptiness_сheck())
-						{
-							stack.push(lexems[i]);/// исключение доступа памяти
-						}
-						else
-						{
-							auto it2 = priority.find(stack.top().stroka);
-							if (it2 != priority.end())
-							{
-								next_lexema_priority = it2->second;
-							}
-							while (lexema_priority <= next_lexema_priority && size_stack != 0)
-							{
-								Lexema element = stack.pop();
-								postfix.push_back(element);//искл
-								if (stack.emptiness_сheck())
-								{
-									break;
-								}
-								auto it2 = priority.find(stack.top().stroka); // index = -1
-								next_lexema_priority = it2->second;//искл
-								size_stack = stack.stack_real_size();
-							}
-							stack.push(lexems[i]);
-						}
+						Lexema tmp = stack.pop();
 					}
-
 				}
+				//case(OPERATION):
+				else
+				{
+					int j = 0;
+					int size_stack = stack.stack_real_size();
+					int next_lexema_priority = 0;
+					int lexema_priority = 0;
+					auto it = priority.find(lexems[i].stroka);
+					if (it != priority.end())
+					{
+						lexema_priority = it->second;
+					}
+					if (stack.emptiness_сheck())
+					{
+						stack.push(lexems[i]);/// исключение доступа памяти
+					}
+					else
+					{
+						auto it2 = priority.find(stack.top().stroka);
+						if (it2 != priority.end())
+						{
+							next_lexema_priority = it2->second;
+						}
+						while (lexema_priority <= next_lexema_priority && size_stack != 0)
+						{
+							Lexema element = stack.pop();
+							postfix.push_back(element);//искл
+							if (stack.emptiness_сheck())
+							{
+								break;
+							}
+							auto it2 = priority.find(stack.top().stroka); // index = -1
+							next_lexema_priority = it2->second;//искл
+							size_stack = stack.stack_real_size();
+						}
+						stack.push(lexems[i]);
+					}
+				}
+
+			}
 		}
 		int stack_size_2 = stack.stack_real_size();
-		for (int i = 0; i < stack_size_2 ; i++)
+		for (int i = 0; i < stack_size_2; i++)
 		{
 			Lexema tmp = stack.pop();
 			postfix.push_back(tmp);
@@ -289,10 +310,10 @@ public:
 				{
 					double tmp = stack.pop();
 					double tmp2 = stack.pop();
-					stack.push(tmp2/tmp);
+					stack.push(tmp2 / tmp);
 				}
 			}
-			else if(postfix[i].typeLex == OPERAND)
+			else if (postfix[i].typeLex == OPERAND)
 			{
 				stack.push(stod(postfix[i].stroka));
 			}
@@ -309,11 +330,11 @@ public:
 		}
 		return stack.top();
 	}
-	string GetInfix() const 
+	string GetInfix() const
 	{
 		return infix;
 	}
-	vector<Lexema> GetPostfix() const 
+	vector<Lexema> GetPostfix() const
 	{
 		return postfix;
 	}

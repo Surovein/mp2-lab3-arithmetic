@@ -184,16 +184,31 @@ TEST(CAN_CALCULATE, test16)
 	X.Variable(values);
 	EXPECT_EQ(51, X.Calculate());
 }
+
 TEST(CAN_CALCULATE, test17)
 {
 	map<char, double> values;
-	string stroka = "10+(-1)";
+	string stroka = "10+(-10+5)";
 	TArithmeticExpression X(stroka);
 	X.Parse2();
 	X.ToPostfix();
 	X.Variable(values);
-	EXPECT_EQ(9, X.Calculate());
+	EXPECT_EQ(5, X.Calculate());
 }
+
+TEST(CAN_CALCULATE, test20)
+{
+	map<char, double> values;
+	string stroka = "-10+50";
+	TArithmeticExpression X(stroka);
+	X.Parse2();
+	X.ToPostfix();
+	X.Variable(values);
+	EXPECT_EQ(40, X.Calculate());
+}
+
+
+
 TEST(CAN_CALCULATE, test18)
 {
 	map<char, double> values;
